@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+notebook/fit_out/
+notebook/out/
+out/
+fit_out/
