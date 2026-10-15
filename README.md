@@ -55,17 +55,32 @@ Three per category. For each event we track one outcome and use the same outcome
 ## Repo layout
 
 ```
+src/mtp_gaps/              # the model: band rule, pair building, grid fit, AR(1) fit, half-life, simulator
+tests/test_model.py        # pytest: c = 0 limit vs AR(1) closed forms, planted-band recovery, helpers
 notebook/
   pull_all_events.ipynb    # downloads, cleans, aligns, and plots everything
-  fit_kappa.ipynb          # fits c and κ, runs the validation checks, makes the figures
+  fit_kappa.ipynb          # fits c and κ, runs the checks, makes the figures (imports src/mtp_gaps)
 results/
   summary.csv              # one row per event
   <event>/gap.csv          # aligned prices and the gap, with outlier flags
   <event>/gap_plot.png     # prices on top, gap below
-pilot_pull.py, FOMC.ipynb  # early one-event experiments, superseded by the notebook
+verification_data/         # nine held-out markets (same pull), used only for the held-out test
+pyproject.toml             # the single project configuration (dependencies, build, pytest)
+uv.lock                    # exact versions of every dependency
+.github/workflows/tests.yml  # runs pytest on every pull request
+pilot_pull.py, FOMC.ipynb  # early one-event experiments, superseded by the notebooks
 ```
 
 The pull notebook writes to a folder called `out/`. The `results/` folder in this repo is a saved copy of one run of that notebook. The fitting notebook reads `results/` (or `out/`) and writes its tables and figures to `fit_out/`, which isn't committed.
+
+## Setup and tests
+
+```
+uv sync            # creates .venv with the exact versions in uv.lock and installs src/mtp_gaps
+uv run pytest      # runs tests/ (also run by GitHub Actions on every pull request)
+```
+
+To run the notebooks in that environment: `uv run --with jupyter jupyter lab`.
 
 ## How to run it
 
@@ -77,7 +92,7 @@ The settings at the top of the notebook control the bar size (`BAR_MINUTES`, def
 
 To fit the model:
 
-1. Open `notebook/fit_kappa.ipynb` in Jupyter or Colab and run it top to bottom (about 5 minutes; the simulations take most of it). It needs `pandas`, `numpy`, and `matplotlib`.
+1. Open `notebook/fit_kappa.ipynb` in Jupyter or Colab and run it top to bottom (about 3–5 minutes; the simulations take most of it). It imports the model from `src/mtp_gaps`: after `uv sync` this just works; without uv, the notebook adds the repo's `src/` folder to the path itself, so run it from inside the cloned repo.
 2. It looks for `results/` next to it. In Colab, where the repo isn't available, it asks you to upload `results.zip`, a zip of the `results/` folder.
 3. Every figure has a "How to read this" caption, and the notebook ends with a generated summary and a table of which results can be trusted.
 
@@ -167,4 +182,3 @@ So far:
 1. Extend the model to handle the two problems above: a second, slower closing rate, and an offset that's allowed to drift slowly.
 2. Estimate the full round-trip cost (both platforms' spreads and fees) to compare with c. Polymarket's historical spreads aren't available, so this needs an assumption or a few days of live recording.
 3. Add more events: roughly 10–20 liquid, carefully matched markets, with a written selection rule and at most one or two markets per underlying event.
-4. Move the notebook logic into a proper package, with tests and CI.
