@@ -2,6 +2,8 @@
 
 AM215 mini-project · Alex Meylikhov · Ravi Tripathi · Ved Pant ·  Fall 2026
 
+**Write-up:** [report.pdf](report.pdf) — how big a Kalshi–Polymarket price gap gets before it closes, and how fast it closes.
+   
 ## The question
 
 Kalshi and Polymarket often list the same real-world event, but the two prices for it don't always match. This project asks two things:
